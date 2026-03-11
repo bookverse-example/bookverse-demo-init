@@ -252,8 +252,7 @@ discover_project_repositories() {
     
     if is_success "$code" && [[ -s "$repos_file" ]]; then
         echo "🚨 DEBUG: Repositories discovered for deletion:" 
-        jq -r '.[] | .key' "$repos_file" | head -20 | while read -r repo; do echo "    - $repo" ; done
-        echo "    (showing first 20 of $(jq length "$repos_file") total)" 
+        jq -r '.[] | .key' "$repos_file" | while read -r repo; do echo "    - $repo" ; done
         jq -r '.[] | .key' "$repos_file" > "$filtered_repos"
         
         jq -n --argfile r "$repos_file" '
