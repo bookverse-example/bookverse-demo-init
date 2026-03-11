@@ -1,12 +1,30 @@
 BookVerse Example
 =================
 
-## Enterprise Microservices Platform with Secure Software Supply Chain Management
+[What is BookVerse Example?](docs/what_is_bookverse_example.md)
 
-![BookVerse Homepage](images/bookverse-homepage.png)
-*BookVerse web application showcasing the complete microservices platform with product catalog, recommendations, and checkout functionality*
+[Indepth Documentation](docs/index.md)
 
-BookVerse is a comprehensive microservices platform that delivers modern software development practices, secure CI/CD pipelines, and enterprise-grade deployment automation. Built with industry-leading technologies, BookVerse provides organizations with a complete reference architecture for scalable, secure, and compliant software delivery.
+
+Quick Start
+-----------
+
+1. Fork bookverse-demo-init repository (this one) to your user or organization.
+
+1. Set necessary secrets for the workflows.
+
+1. Run the `Step 1: Switch Platform` action.  FIXME: This should be renamed.
+
+1. Run the `Step 2: Setup Platform` action.  FIXME: This should be renamed.
+
+1. Run the `Step 3: Initial Build Actions` action.  FIXME: This should be created to run each of the build actions in each of the sub projects.
+
+
+
+
+
+
+
 
 ---
 
