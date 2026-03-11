@@ -1,4 +1,4 @@
-name: '🔄 Switch Platform'
+name: 'Step 1: Initialize Repositories'
 
 on:
   workflow_dispatch:

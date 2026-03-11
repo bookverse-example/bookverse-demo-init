@@ -1,6 +1,8 @@
 BookVerse Example
 =================
 
+FIXME: Give an executive summary here.
+
 [What is BookVerse Example?](docs/what_is_bookverse_example.md)
 
 [Indepth Documentation](docs/index.md)
@@ -13,7 +15,8 @@ Quick Start
 
 1. Set necessary secrets for the workflows.
 
-1. Run the `Step 1: Switch Platform` action.  FIXME: This should be renamed.
+1. Run the `Step 1: Initialize Repositories` action.
+   FIXME: Add recommended first settings here.
 
 1. Run the `Step 2: Setup Platform` action.  FIXME: This should be renamed.
 
@@ -29,31 +32,7 @@ Quick Start
 ---
 
 
-## 🛡️ Enterprise Governance & Policy Framework
 
-BookVerse implements **comprehensive unified policies** that demonstrate enterprise-grade governance, security, and compliance capabilities:
-
-### **🎯 14 Automated Policy Gates**
-- **DEV Stage**: Quality gates, security scanning, and traceability requirements
-- **QA Stage**: Dynamic security testing and comprehensive API validation  
-- **STAGING Stage**: Penetration testing, change management, and infrastructure scanning
-- **PROD Release**: Multi-stage completion verification and approval workflows
-
-### **🔒 Security by Design**
-- **SLSA Provenance**: Supply chain security with cryptographic verification
-- **Multi-Layer Security**: SAST, DAST, penetration testing, and IaC scanning
-- **Evidence Collection**: Automated evidence gathering with cryptographic signing
-- **Audit Compliance**: Complete audit trails for regulatory and enterprise requirements
-
-### **⚡ Automated Enforcement**
-- **CI/CD Integration**: Policies automatically enforced during promotion workflows
-- **Real-time Evaluation**: Policy compliance evaluated in real-time during deployments
-- **Blocking & Warning Modes**: Configurable enforcement levels for different environments
-- **Compliance Reporting**: Comprehensive dashboards and audit reporting
-
-**📋 Learn More**: Explore the complete [Governance Framework](docs/ARCHITECTURE.md#%EF%B8%8F-governance--policy-framework) in our architecture documentation.
-
----
 
 ## 🚀 Initial Setup
 
