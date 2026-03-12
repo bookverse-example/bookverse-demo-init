@@ -1,7 +1,19 @@
 BookVerse Example
 =================
 
-[//]: <> (FIXME: Give an executive summary here.)
+BookVerse Example is a cloud-native microservices reference application that demonstrates secure software delivery using
+the JFrog Platform. Built as an online bookstore, it comprises an Inventory Service for product catalog management, a
+Recommendations Service powered by machine learning, a Checkout Service for order processing, a vanilla JavaScript Web
+Application, shared Infrastructure Libraries, Helm Charts for Kubernetes deployment, and a Platform Service for
+integration testing — each showcasing distinct CI/CD build patterns ranging from single-container deployments to
+multi-artifact library publishing.
+
+The project's primary purpose is to provide a complete, end-to-end reference architecture for enterprise-grade software
+supply chain security. It leverages JFrog AppTrust with 14 automated policy gates spanning four lifecycle stages (DEV,
+QA, STAGING, and PROD), cryptographically signed evidence collection, SLSA provenance verification, and multi-layer
+security scanning (SAST, DAST, penetration testing, and IaC). Deployments are managed through GitOps workflows with
+ArgoCD, and the entire environment — including JFrog Platform provisioning, GitHub repository creation, and OIDC
+integration — can be stood up automatically through the orchestration workflows in this repository.
 
 [What is BookVerse Example?](docs/what_is_bookverse_example.md)
 
