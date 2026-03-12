@@ -15,21 +15,21 @@ Quick Start
    actions and script necessary to setup and cleanup the workflows and JFrog Platform.  Only forking this repository is
    required as the first action to run will fork the remaining git repositories.
 
-1. Set necessary secrets for the workflows.  These secrets can be set on the *Settings -> Secrets and variables ->
-   Actions* page in the *Repository Secrets* section.
+1. Set necessary secrets for the workflows.  These secrets can be set on the _Settings -> Secrets and variables ->
+   Actions_ page in the _Repository Secrets_ section.
 
    * `JFROG_ADMIN_TOKEN` - An admin level token for the JFrog Platform installation that will be used.
 
-   * `GH_TOKEN` - A GitHub Personal Access Token (PAT) classic with *repo*, *workflow*, and *admin:repo_hook*
+   * `GH_TOKEN` - A GitHub Personal Access Token (PAT) classic with _'repo'_, _'workflow'_, and _'admin:repo_hook'_
                   permissions.  This is required to fork the other repositories and setup the project.
 
-1. Run the `Step 1: Initialize Repositories` action.  This can be found on the `Actions` tab.  Use the settings below to
+1. Run the _Step 1: Initialize Repositories_ action.  This can be found on the _Actions_ tab.  Use the settings below to
    configure the initial setup run.
 
    * Setup Mode: `initial_setup`
 
    * JFrog Platform Host: `https://<JPD_URL>`  This will be the URL for your JFrog Platform.
-     e.g. `https://example.jfrog.io`
+     e.g. _https://example.jfrog.io_
 
 [//]: <> (FIXME: Should the Platform Host / URL be moved to a secret?)
 
@@ -39,7 +39,7 @@ Quick Start
 
    * Generate Evidence Keys: `true`
 
-   * Evidence Key Type: `rsa`  Can be `rsa`, `ec`, or `ed25519`.
+   * Evidence Key Type: `rsa`  Can be _rsa_, _ec_, or _ed25519_.
 
    * Evidence Key Alias: `bookverse-signing-key`
 
@@ -47,9 +47,9 @@ Quick Start
 
 [//]: <> (FIXME: What does this do?  Should it be removed?)
 
-1. Run the `Step 2: Setup Platform` action.
+1. Run the _Step 2: Setup Platform_ action.
 
-1. Run the `Step 3: Initial Build Actions` action.
+1. Run the _Step 3: Initial Build Actions_ action.
 
 [//]: <> (FIXME: This should be created to run each of the build actions in each of the sub projects.)
 
