@@ -15,10 +15,6 @@ on:
         description: 'JFrog Platform Host (e.g., https://mycompany.jfrog.io)'
         required: true
         type: string
-      admin_token:
-        description: 'JFrog Admin Token for the new platform (optional if JFROG_ADMIN_TOKEN secret is set)'
-        required: false
-        type: string
       confirm_switch:
         description: 'Type "SWITCH" to confirm (required for platform_switch mode)'
         required: false
@@ -54,8 +50,11 @@ on:
         default: false
 
 env:
+  NEW_JFROG_URL: ${{ github.event.inputs.jpd_host }}
+  JFROG_ADMIN_TOKEN: ${{ secrets.JFROG_ADMIN_TOKEN }}
   GH_TOKEN: ${{ secrets.GH_TOKEN }}
   COMPONENTS: "checkout demo-assets helm infra inventory platform recommendations web"
+  JFROG_CLI_AVOID_NEW_VERSION_WARNING: "TRUE"
 
 concurrency:
   group: switch-platform-${{ github.ref }}
@@ -86,16 +85,24 @@ jobs:
             fi
             echo "✅ Platform switch confirmed. Proceeding with platform migration..."
           else
-            echo "✅ Initial setup mode detected. Skipping migration confirmation."
+            echo 
+          
+          # Validate the JFrog URL
+          if [[ -z "${NEW_JFROG_URL}" ]]; then
+            echo "ERROR: NEW_JFROG_URL secret not set."
+            exit 1
           fi
-
-      - name: Mask sensitive inputs
-        run: |
-          if [[ -n "${{ github.event.inputs.admin_token }}" ]]; then
-            echo "::add-mask::${{ github.event.inputs.admin_token }}"
+          
+          # Validate the JFrog Admin Token
+          if [[ -z "${JFROG_ADMIN_TOKEN}" ]]; then
+            echo "ERROR: JFROG_ADMIN_TOKEN secret not set."
+            exit 1
           fi
-          if [[ -n "${{ secrets.JFROG_ADMIN_TOKEN }}" ]]; then
-            echo "::add-mask::${{ secrets.JFROG_ADMIN_TOKEN }}"
+          
+          # Validate the GitHub Token
+          if [[ -z "${GH_TOKEN}" ]]; then
+            echo "ERROR: GH_TOKEN secret not set."
+            exit 1
           fi
 
       - name: Verify Git Repository Forks
@@ -109,18 +116,13 @@ jobs:
               gh repo fork bookverse-example/bookverse-${item} --fork-name bookverse-${item}
             fi
           done
-          #gh repo fork bookverse-example/bookverse-checkout --fork-name bookverse-checkout
-          #gh repo fork bookverse-example/bookverse-demo-assets --fork-name bookverse-demo-assets
-          #gh repo fork bookverse-example/bookverse-helm --fork-name bookverse-helm
-          #gh repo fork bookverse-example/bookverse-infra --fork-name bookverse-infra
-          #gh repo fork bookverse-example/bookverse-inventory --fork-name bookverse-inventory
-          #gh repo fork bookverse-example/bookverse-platform --fork-name bookverse-platform
-          #gh repo fork bookverse-example/bookverse-recommendations --fork-name bookverse-recommendations
-          #gh repo fork bookverse-example/bookverse-web --fork-name bookverse-web
+
+      - name: Verify JFrog Platform Connectivity
+        run: |
+          jf rt ping
 
       - name: Switch/Setup JFrog Platform
         run: |
-          export NEW_JFROG_URL='${{ github.event.inputs.jpd_host }}'
           export SETUP_MODE='${{ github.event.inputs.setup_mode }}'
           export GENERATE_EVIDENCE_KEYS='${{ github.event.inputs.generate_evidence_keys }}'
           export EVIDENCE_KEY_TYPE='${{ github.event.inputs.evidence_key_type }}'
@@ -128,16 +130,6 @@ jobs:
           export UPDATE_CODE_URLS='${{ github.event.inputs.update_code_urls }}'
           export JFROG_CLI_AVOID_NEW_VERSION_WARNING=true
           
-          if [[ -n "${{ github.event.inputs.admin_token }}" ]]; then
-            export NEW_JFROG_ADMIN_TOKEN='${{ github.event.inputs.admin_token }}'
-            echo "🔐 Using admin_token from workflow input"
-          elif [[ -n "${{ secrets.JFROG_ADMIN_TOKEN }}" ]]; then
-            export NEW_JFROG_ADMIN_TOKEN='${{ secrets.JFROG_ADMIN_TOKEN }}'
-            echo "🔐 Using JFROG_ADMIN_TOKEN from repository secrets"
-          else
-            echo "❌ No JFROG_ADMIN_TOKEN found in secrets or workflow inputs"
-            exit 1
-          fi
           export NO_COLOR=1
           LOG_FILE="switch-platform.log"
           echo "LOG_FILE=$LOG_FILE" >> "$GITHUB_ENV"
@@ -189,18 +181,9 @@ jobs:
           
       - name: Validate New Platform
         run: |
-          export NEW_JFROG_URL='${{ github.event.inputs.jpd_host }}'
-          if [[ -n "${{ github.event.inputs.admin_token }}" ]]; then
-            export NEW_JFROG_ADMIN_TOKEN='${{ github.event.inputs.admin_token }}'
-          elif [[ -n "${{ secrets.JFROG_ADMIN_TOKEN }}" ]]; then
-            export NEW_JFROG_ADMIN_TOKEN='${{ secrets.JFROG_ADMIN_TOKEN }}'
-          else
-            echo "❌ No JFROG_ADMIN_TOKEN found in secrets or workflow inputs"
-            exit 1
-          fi
           echo "🔍 Validating new platform connectivity..."
-          
-          if curl -s --fail --header "Authorization: Bearer $NEW_JFROG_ADMIN_TOKEN" \
+          # FIXME: Shouldn't this use the JF CLI?
+          if curl -s --fail --header "Authorization: Bearer ${JFROG_ADMIN_TOKEN}" \
               "${NEW_JFROG_URL}/artifactory/api/system/ping" > /dev/null; then
             echo "✅ New platform validation successful"
           else
@@ -236,16 +219,6 @@ jobs:
             echo "   Make sure your cluster is accessible and kubeconfig is configured"
             echo "   Skipping K8s update - you'll need to update manually"
             exit 0
-          fi
-          
-          export NEW_JFROG_URL='${{ github.event.inputs.jpd_host }}'
-          if [[ -n "${{ github.event.inputs.admin_token }}" ]]; then
-            export NEW_JFROG_ADMIN_TOKEN='${{ github.event.inputs.admin_token }}'
-          elif [[ -n "${{ secrets.JFROG_ADMIN_TOKEN }}" ]]; then
-            export NEW_JFROG_ADMIN_TOKEN='${{ secrets.JFROG_ADMIN_TOKEN }}'
-          else
-            echo "❌ No JFROG_ADMIN_TOKEN found in secrets or workflow inputs"
-            exit 1
           fi
           
           if ./scripts/k8s/update-registry.sh --restart-deployments; then
