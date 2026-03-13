@@ -85,7 +85,8 @@ jobs:
             fi
             echo "✅ Platform switch confirmed. Proceeding with platform migration..."
           else
-            echo 
+            echo "? initial_setup ?"
+          fi
           
           # Validate the JFrog URL
           if [[ -z "${NEW_JFROG_URL}" ]]; then
