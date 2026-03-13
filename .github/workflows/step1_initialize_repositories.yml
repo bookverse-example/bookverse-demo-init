@@ -64,16 +64,19 @@ jobs:
   switch-platform:
     runs-on: ubuntu-latest
     name: Switch Platform
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup JFrog CLI
         uses: jfrog/setup-jfrog-cli@v4
         with:
           version: 2.88.0
-          
+        env:
+          JF_URL: ${NEW_JFROG_URL}
+          JF_ACCESS_TOKEN: ${JFROG_ADMIN_TOKEN}
+
       - name: Validate Confirmation
         run: |
           SETUP_MODE="${{ github.event.inputs.setup_mode }}"
