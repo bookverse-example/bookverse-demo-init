@@ -54,6 +54,7 @@ env:
   JFROG_ADMIN_TOKEN: ${{ secrets.JFROG_ADMIN_TOKEN }}
   GH_TOKEN: ${{ secrets.GH_TOKEN }}
   COMPONENTS: "checkout demo-assets helm infra inventory platform recommendations web"
+  JFROG_CLI_AVOID_NEW_VERSION_WARNING: "TRUE"
 
 concurrency:
   group: switch-platform-${{ github.ref }}
@@ -97,6 +98,12 @@ jobs:
             echo "ERROR: JFROG_ADMIN_TOKEN secret not set."
             exit 1
           fi
+          
+          # Validate the GitHub Token
+          if [[ -z "${GH_TOKEN}" ]]; then
+            echo "ERROR: GH_TOKEN secret not set."
+            exit 1
+          fi
 
       - name: Verify Git Repository Forks
         run: |
@@ -109,6 +116,10 @@ jobs:
               gh repo fork bookverse-example/bookverse-${item} --fork-name bookverse-${item}
             fi
           done
+
+      - name: Verify JFrog Platform Connectivity
+        run: |
+          jf rt ping
 
       - name: Switch/Setup JFrog Platform
         run: |

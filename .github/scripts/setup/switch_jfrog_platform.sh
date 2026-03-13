@@ -93,42 +93,44 @@ SERVICES_FAILED=0
 
 
 validate_inputs() {
-    log_info "Validating inputs..."
-    
-    if [[ -n "$NEW_JFROG_URL" ]]; then
-        log_info "NEW_JFROG_URL length: ${#NEW_JFROG_URL}"
-        log_info "NEW_JFROG_URL starts with: ${NEW_JFROG_URL:0:8}..."
-        log_info "NEW_JFROG_URL ends with: ...${NEW_JFROG_URL: -10}"
-    else
-        log_error "NEW_JFROG_URL is required"
-        exit 1
-    fi
-    
-    if [[ -z "$JFROG_ADMIN_TOKEN" ]]; then
-        log_error "JFROG_ADMIN_TOKEN is required"
-        exit 1
-    fi
-    
-    if [[ -z "$GH_TOKEN" ]]; then
-        log_error "GH_TOKEN is required for updating repositories"
-        exit 1
-    fi
-    
-    log_success "All required inputs provided"
+    # NOTE: Validating Inputs in Workflow directly, not needed here.
+    #log_info "Validating inputs..."
+    #
+    #if [[ -n "$NEW_JFROG_URL" ]]; then
+    #    log_info "NEW_JFROG_URL length: ${#NEW_JFROG_URL}"
+    #    log_info "NEW_JFROG_URL starts with: ${NEW_JFROG_URL:0:8}..."
+    #    log_info "NEW_JFROG_URL ends with: ...${NEW_JFROG_URL: -10}"
+    #else
+    #    log_error "NEW_JFROG_URL is required"
+    #    exit 1
+    #fi
+    #
+    #if [[ -z "$JFROG_ADMIN_TOKEN" ]]; then
+    #    log_error "JFROG_ADMIN_TOKEN is required"
+    #    exit 1
+    #fi
+    #
+    #if [[ -z "$GH_TOKEN" ]]; then
+    #    log_error "GH_TOKEN is required for updating repositories"
+    #    exit 1
+    #fi
+    #
+    #log_success "All required inputs provided"
 }
 
 validate_host_format() {
-    log_info "Validating host format..."
-    
-    NEW_JFROG_URL=$(echo "$NEW_JFROG_URL" | sed 's:/*$::')
-    
-    if [[ ! "$NEW_JFROG_URL" =~ ^https://[a-zA-Z0-9.-]+\.jfrog\.io$ ]]; then
-        log_error "Invalid host format. Expected: https://host.jfrog.io"
-        log_error "Received: $NEW_JFROG_URL"
-        exit 1
-    fi
-    
-    log_success "Host format is valid: $NEW_JFROG_URL"
+    # NOTE: No reason to not support self-hosted JPDs.
+    #log_info "Validating host format..."
+    #
+    #NEW_JFROG_URL=$(echo "$NEW_JFROG_URL" | sed 's:/*$::')
+    #
+    #if [[ ! "$NEW_JFROG_URL" =~ ^https://[a-zA-Z0-9.-]+\.jfrog\.io$ ]]; then
+    #    log_error "Invalid host format. Expected: https://host.jfrog.io"
+    #    log_error "Received: $NEW_JFROG_URL"
+    #    exit 1
+    #fi
+    #
+    #log_success "Host format is valid: $NEW_JFROG_URL"
 }
 
 detect_setup_mode() {
@@ -209,99 +211,101 @@ check_same_platform() {
     fi
 }
 
-# FIXME: Why isn't this using the CLI?
 test_platform_connectivity() {
-    log_info "Testing platform connectivity..."
-    
-    if ! curl -s --fail --max-time 10 "$NEW_JFROG_URL" > /dev/null; then
-        log_error "Cannot reach JPD platform: $NEW_JFROG_URL"
-        exit 1
-    fi
-    
-    log_success "Platform is reachable"
+    # NOTE: Moving to a CLI check in the workflow directly
+    #log_info "Testing platform connectivity..."
+    #
+    #if ! curl -s --fail --max-time 10 "$NEW_JFROG_URL" > /dev/null; then
+    #    log_error "Cannot reach JPD platform: $NEW_JFROG_URL"
+    #    exit 1
+    #fi
+    #
+    #log_success "Platform is reachable"
 }
 
-# FIXME: Why isn't this using the CLI?
 test_platform_authentication() {
-    log_info "Testing platform authentication..."
-    
-    local response
-    local was_xtrace=0
-    if [[ -o xtrace ]]; then was_xtrace=1; set +x; fi
-    log_info "Command: curl -s --max-time 10 --header 'Authorization: Bearer ***' --write-out '%{http_code}' '$NEW_JFROG_URL/artifactory/api/system/ping'"
-    response=$(curl -s --max-time 10 \
-        --header "Authorization: Bearer $JFROG_ADMIN_TOKEN" \
-        --write-out "%{http_code}" \
-        "$NEW_JFROG_URL/artifactory/api/system/ping")
-    if [[ $was_xtrace -eq 1 ]]; then set -x; fi
-    
-    local http_code="${response: -3}"
-    local body="${response%???}"
-    
-    if [[ "$http_code" != "200" ]]; then
-        log_error "Authentication failed (HTTP $http_code)"
-        log_error "Response: $body"
-        echo
-        log_info "Reproduce locally:"
-        echo "curl -i -s --max-time 10 --header 'Authorization: Bearer ***' '$NEW_JFROG_URL/artifactory/api/system/ping'"
-        if [[ "${CONTINUE_ON_AUTH_FAILURE:-0}" == "1" ]]; then
-            AUTH_FAILED=1
-            log_warning "Continuing despite authentication failure to update GitHub repo secrets/variables"
-            return 0
-        fi
-        exit 1
-    fi
-    
-    log_success "Authentication successful"
+    # NOTE: Moving to a CLI check in the workflow directly
+    #log_info "Testing platform authentication..."
+    #
+    #local response
+    #local was_xtrace=0
+    #if [[ -o xtrace ]]; then was_xtrace=1; set +x; fi
+    #log_info "Command: curl -s --max-time 10 --header 'Authorization: Bearer ***' --write-out '%{http_code}' '$NEW_JFROG_URL/artifactory/api/system/ping'"
+    #response=$(curl -s --max-time 10 \
+    #    --header "Authorization: Bearer $JFROG_ADMIN_TOKEN" \
+    #    --write-out "%{http_code}" \
+    #    "$NEW_JFROG_URL/artifactory/api/system/ping")
+    #if [[ $was_xtrace -eq 1 ]]; then set -x; fi
+    #
+    #local http_code="${response: -3}"
+    #local body="${response%???}"
+    #
+    #if [[ "$http_code" != "200" ]]; then
+    #    log_error "Authentication failed (HTTP $http_code)"
+    #    log_error "Response: $body"
+    #    echo
+    #    log_info "Reproduce locally:"
+    #    echo "curl -i -s --max-time 10 --header 'Authorization: Bearer ***' '$NEW_JFROG_URL/artifactory/api/system/ping'"
+    #    if [[ "${CONTINUE_ON_AUTH_FAILURE:-0}" == "1" ]]; then
+    #        AUTH_FAILED=1
+    #        log_warning "Continuing despite authentication failure to update GitHub repo secrets/variables"
+    #        return 0
+    #    fi
+    #    exit 1
+    #fi
+    #
+    #log_success "Authentication successful"
 }
 
-# FIXME: Is this needed?  It looks redundant to the above.
 test_platform_services() {
-    log_info "Testing platform services..."
-    
-    local was_xtrace=0
-    if [[ -o xtrace ]]; then was_xtrace=1; set +x; fi
-    log_info "Command: curl -s --fail --max-time 10 --header 'Authorization: Bearer ***' '$NEW_JFROG_URL/artifactory/api/system/ping'"
-    if ! curl -s --fail --max-time 10 \
-        --header "Authorization: Bearer $JFROG_ADMIN_TOKEN" \
-        "$NEW_JFROG_URL/artifactory/api/system/ping" > /dev/null; then
-        log_error "Artifactory service is not available"
-        if [[ $was_xtrace -eq 1 ]]; then set -x; fi
-        if [[ "${CONTINUE_ON_AUTH_FAILURE:-0}" == "1" ]]; then
-            SERVICES_FAILED=1
-            log_warning "Continuing despite service check failure to update GitHub repo secrets/variables"
-            return 0
-        fi
-        exit 1
-    fi
-    
-    log_info "Command: curl -s --fail --max-time 10 --header 'Authorization: Bearer ***' '$NEW_JFROG_URL/access/api/v1/system/ping'"
-    if ! curl -s --fail --max-time 10 \
-        --header "Authorization: Bearer $JFROG_ADMIN_TOKEN" \
-        "$NEW_JFROG_URL/access/api/v1/system/ping" > /dev/null; then
-        log_warning "Access service is not available (may be expected for some deployments)"
-    fi
-    if [[ $was_xtrace -eq 1 ]]; then set -x; fi
-    
-    log_success "Core services are available"
+    # NOTE: This is redundant.  If access is offline or inaccessible, then the JPD is broken and it's not this scripts issue
+    #log_info "Testing platform services..."
+    #
+    #local was_xtrace=0
+    #if [[ -o xtrace ]]; then was_xtrace=1; set +x; fi
+    #log_info "Command: curl -s --fail --max-time 10 --header 'Authorization: Bearer ***' '$NEW_JFROG_URL/artifactory/api/system/ping'"
+    #if ! curl -s --fail --max-time 10 \
+    #    --header "Authorization: Bearer $JFROG_ADMIN_TOKEN" \
+    #    "$NEW_JFROG_URL/artifactory/api/system/ping" > /dev/null; then
+    #    log_error "Artifactory service is not available"
+    #    if [[ $was_xtrace -eq 1 ]]; then set -x; fi
+    #    if [[ "${CONTINUE_ON_AUTH_FAILURE:-0}" == "1" ]]; then
+    #        SERVICES_FAILED=1
+    #        log_warning "Continuing despite service check failure to update GitHub repo secrets/variables"
+    #        return 0
+    #    fi
+    #    exit 1
+    #fi
+    #
+    #log_info "Command: curl -s --fail --max-time 10 --header 'Authorization: Bearer ***' '$NEW_JFROG_URL/access/api/v1/system/ping'"
+    #if ! curl -s --fail --max-time 10 \
+    #    --header "Authorization: Bearer $JFROG_ADMIN_TOKEN" \
+    #    "$NEW_JFROG_URL/access/api/v1/system/ping" > /dev/null; then
+    #    log_warning "Access service is not available (may be expected for some deployments)"
+    #fi
+    #if [[ $was_xtrace -eq 1 ]]; then set -x; fi
+    #
+    #log_success "Core services are available"
 }
 
 
 extract_docker_registry() {
+    # NOTE: This returns the value inline... Probably a cleaner way to do this.
     echo "$NEW_JFROG_URL" | sed 's|https://||'
 }
 
 validate_gh_auth() {
-    log_info "Validating GitHub CLI authentication..."
-    gh config set prompt disabled true >/dev/null 2>&1 || true
-    if gh auth status >/dev/null 2>&1; then
-        local gh_user
-        gh_user=$(gh api user --jq .login 2>/dev/null || echo "unknown")
-        log_success "GitHub CLI authenticated as: ${gh_user}"
-    else
-        log_error "GitHub CLI not authenticated. Set GH_TOKEN with required scopes (repo, actions, admin:repo_hook)."
-        exit 1
-    fi
+    # NOTE: This is already validated by the calling workflow, not needed here.
+    #log_info "Validating GitHub CLI authentication..."
+    #gh config set prompt disabled true >/dev/null 2>&1 || true
+    #if gh auth status >/dev/null 2>&1; then
+    #    local gh_user
+    #    gh_user=$(gh api user --jq .login 2>/dev/null || echo "unknown")
+    #    log_success "GitHub CLI authenticated as: ${gh_user}"
+    #else
+    #    log_error "GitHub CLI not authenticated. Set GH_TOKEN with required scopes (repo, actions, admin:repo_hook)."
+    #    exit 1
+    #fi
 }
 
 trim_whitespace() {
