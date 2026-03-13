@@ -37,6 +37,9 @@ Quick Start
 2. Set necessary secrets for the workflows.  These secrets can be set on the _Settings -> Secrets and variables ->
    Actions_ page in the _Repository Secrets_ section.
 
+   * `JFROG_URL` - The URL of the JFrog Platform installation that will be used.  This should start with _https://_ as
+                   all good HTTPS URLs should.
+
    * `JFROG_ADMIN_TOKEN` - An admin level token for the JFrog Platform installation that will be used.
 
    * `GH_TOKEN` - A GitHub Personal Access Token (PAT) classic with _'repo'_, _'workflow'_, and _'admin:repo_hook'_
@@ -46,9 +49,6 @@ Quick Start
    configure the initial setup run.
 
    * Setup Mode: `initial_setup`
-
-   * JFrog Platform Host: `https://<JPD_URL>`  This will be the URL for your JFrog Platform.
-     e.g. _https://example.jfrog.io_
 
    * Confirm Switch: Leave empty as not needed for initial_setup.
 

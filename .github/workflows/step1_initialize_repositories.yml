@@ -11,10 +11,6 @@ on:
           - initial_setup
           - platform_switch
         default: 'initial_setup'
-      jpd_host:
-        description: 'JFrog Platform Host (e.g., https://mycompany.jfrog.io)'
-        required: true
-        type: string
       confirm_switch:
         description: 'Type "SWITCH" to confirm (required for platform_switch mode)'
         required: false
@@ -50,8 +46,8 @@ on:
         default: false
 
 env:
-  NEW_JFROG_URL: ${{ github.event.inputs.jpd_host }}
-  JF_URL: ${{ github.event.inputs.jpd_host }}
+  NEW_JFROG_URL: ${{ secrets.JFROG_URL }}
+  JF_URL: ${{ secrets.JFROG_URL }}
   JFROG_ADMIN_TOKEN: ${{ secrets.JFROG_ADMIN_TOKEN }}
   JF_ACCESS_TOKEN: ${{ secrets.JFROG_ADMIN_TOKEN }}
   GH_TOKEN: ${{ secrets.GH_TOKEN }}
@@ -93,7 +89,7 @@ jobs:
           
           # Validate the JFrog URL
           if [[ -z "${NEW_JFROG_URL}" ]]; then
-            echo "ERROR: NEW_JFROG_URL secret not set."
+            echo "ERROR: JFROG_URL secret not set."
             exit 1
           fi
           
