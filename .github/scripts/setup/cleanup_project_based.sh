@@ -231,7 +231,7 @@ discover_project_repositories() {
             echo "✅ Filtered by repository key containing '$PROJECT_KEY'" 
             
             echo "📦 Found repositories:" 
-            jq -r '.[].key' "$repos_file" 2>/dev/null | head -10 | while read -r repo; do
+            jq -r '.[].key' "$repos_file" 2>/dev/null | while read -r repo; do
                 echo "   - $repo" 
             done
         else
