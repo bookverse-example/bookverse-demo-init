@@ -15,20 +15,16 @@ on:
         description: 'Type "SWITCH" to confirm (required for platform_switch mode)'
         required: false
         type: string
+      project_key:
+        description: 'The project key that should be used for the BookVerse Project in the JFrog Platform'
+        required: false
+        type: string
+        default: 'bookverse'
       generate_evidence_keys:
-        description: 'Generate new evidence keys if not present (recommended for initial_setup)'
+        description: 'Force generation of new Evidence Signing Keys.'
         required: false
         type: boolean
-        default: true
-      evidence_key_type:
-        description: 'Evidence key algorithm (rsa, ec, ed25519)'
-        required: false
-        type: choice
-        options:
-          - rsa
-          - ec
-          - ed25519
-        default: 'rsa'
+        default: false
       evidence_key_alias:
         description: 'Evidence key alias (default: bookverse-signing-key)'
         required: false
@@ -53,8 +49,7 @@ env:
   GH_TOKEN: ${{ secrets.GH_TOKEN }}
   COMPONENTS: "checkout demo-assets demo-init helm infra inventory platform recommendations web"
   JFROG_CLI_AVOID_NEW_VERSION_WARNING: "TRUE"
-  EVIDENCE_KEY_ALIAS: ${{ github.event.inputs.evidence_key_alias }}
-  PROJECT_KEY: bookverse
+  PROJECT_KEY: ${{ github.event.inputs.project_key }}
 
 concurrency:
   group: switch-platform-${{ github.ref }}
@@ -125,11 +120,14 @@ jobs:
           jf rt ping
 
       - name: Generate Evidence Keys
-        if: ${{ github.event.inputs.generate_evidence_keys }}
+        env:
+          EVIDENCE_KEY_ALIAS: ${{ github.event.inputs.evidence_key_alias }}
+          EVIDENCE_PRIVATE_SECRET: ${{ secret.EVIDENCE_PRIVATE_KEY }}
+          EVIDENCE_PUBLIC_VARIABLE: ${{ vars.EVIDENCE_PUBLIC_KEY }}
+          EVIDENCE_ALIAS_VARIABLE: ${{ vars.EVIDENCE_KEY_ALIAS }}
+        if: ${{ env.EVIDENCE_PRIVATE_SECRET == '' || env.EVIDENCE_PUBLIC_VARIABLE == '' || env.EVIDENCE_ALIAS_VARIABLE == '' || github.event.inputs.generate_evidence_keys }}
         run: |
-          echo "Generating evidence keys"
-          pwd
-          # FIXME: Should these be recreated if they already exist?  Or pull pre-existing ones?
+          echo "Generating Evidence Signing Keys.  Either the keys are unset or the force regenerate option has been set."
           source .github/scripts/setup/upload_evidence_public_key.sh
           jf evd generate-key-pair --key-alias "${EVIDENCE_KEY_ALIAS}" --key-file-name "${EVIDENCE_KEY_ALIAS}" --key-file-path "./keys" --upload-public-key="false"
           upload_evidence_key_to_jfrog "./keys/${EVIDENCE_KEY_ALIAS}.pub" "${EVIDENCE_KEY_ALIAS}"
@@ -164,9 +162,9 @@ jobs:
         run: |
           export SETUP_MODE='${{ github.event.inputs.setup_mode }}'
           export GENERATE_EVIDENCE_KEYS='${{ github.event.inputs.generate_evidence_keys }}'
-          export EVIDENCE_KEY_TYPE='${{ github.event.inputs.evidence_key_type }}'
+          export EVIDENCE_KEY_TYPE='ec'
           export UPDATE_CODE_URLS='${{ github.event.inputs.update_code_urls }}'
-          export JFROG_CLI_AVOID_NEW_VERSION_WARNING=true
+          #export JFROG_CLI_AVOID_NEW_VERSION_WARNING=true
           
           export NO_COLOR=1
           LOG_FILE="switch-platform.log"
