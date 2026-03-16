@@ -45,16 +45,26 @@ jobs:
           version: 2.91.0
 
       - name: Validate Confirmation
+        env:
+          JFROG_URL: ${{ vars.JFROG_URL }}
+          JFROG_ADMIN_TOKEN: ${{ secrets.JFROG_ADMIN_TOKEN }}
+          PROJECT_KEY: ${{ vars.PROJECT_KEY }}
         run: |
           # Validate the JFrog URL
-          if [[ -z "${NEW_JFROG_URL}" ]]; then
-            echo "ERROR: JFROG_URL secret not set."
+          if [[ -z "${JFROG_URL}" ]]; then
+            echo "ERROR: JFROG_URL variable not set."
             exit 1
           fi
           
           # Validate the JFrog Admin Token
           if [[ -z "${JFROG_ADMIN_TOKEN}" ]]; then
             echo "ERROR: JFROG_ADMIN_TOKEN secret not set."
+            exit 1
+          fi
+          
+          # Validate the JFrog Project Key
+          if [[ -z "${PROJECT_KEY}" ]]; then
+            echo "ERROR: PROJECT_KEY variable not set."
             exit 1
           fi
           
