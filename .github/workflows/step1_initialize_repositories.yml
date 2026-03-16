@@ -3,6 +3,7 @@ name: 'Step 1: Initialize Repositories'
 on:
   workflow_dispatch:
     inputs:
+      # FIXME: Move the project key to a variable, not an input.
       project_key:
         description: 'The project key that should be used for the BookVerse Project in the JFrog Platform'
         required: false
@@ -173,17 +174,17 @@ jobs:
           if [[ "${{ job.status }}" == "success" ]]; then
             echo "**BookVerse is now configured for the new platform**" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
-            echo "- Platform: \`${{ github.event.inputs.jpd_host }}\`" >> $GITHUB_STEP_SUMMARY
+            echo "- Platform: \`${{ vars.JFROG_URL }}\`" >> $GITHUB_STEP_SUMMARY
             echo "- Forked (if not already) the following repos:" >> $GITHUB_STEP_SUMMARY
             for item in ${COMPONENTS}; do
               echo "  - ${{ github.repository_owner }}/bookverse-${item}" >> $GITHUB_STEP_SUMMARY
             done
             echo "- Updated the following secrets and variables in the forked repos:" >> $GITHUB_STEP_SUMMARY
             echo "  - Secret JFROG_ADMIN_TOKEN: ***" >> $GITHUB_STEP_SUMMARY
-            echo "  - Variable JFROG_URL: ${{ vars.JFROG_URL }} >> $GITHUB_STEP_SUMMARY
-            echo "  - Variable PROJECT_KEY: ${{ vars.PROJECT_KEY }} >> $GITHUB_STEP_SUMMARY
+            echo "  - Variable JFROG_URL: ${{ vars.JFROG_URL }}" >> $GITHUB_STEP_SUMMARY
+            echo "  - Variable PROJECT_KEY: ${{ vars.PROJECT_KEY }}" >> $GITHUB_STEP_SUMMARY
             echo "  - Variable DOCKER_REGISTRY: ${{ vars.DOCKER_REGISTRY }}" >> $GITHUB_STEP_SUMMARY
             echo "  - Secret EVIDENCE_PRIVATE_KEY: ***" >> $GITHUB_STEP_SUMMARY
-            echo "  - Variable EVIDENCE_PUBLIC_KEY: ${{ vars.EVIDENCE_PUBLIC_KEY }} >> $GITHUB_STEP_SUMMARY
-            echo "  - Variable EVIDENCE_KEY_ALIAS: ${{ vars.EVIDENCE_KEY_ALIAS }} >> $GITHUB_STEP_SUMMARY
+            echo "  - Variable EVIDENCE_PUBLIC_KEY: ${{ vars.EVIDENCE_PUBLIC_KEY }}" >> $GITHUB_STEP_SUMMARY
+            echo "  - Variable EVIDENCE_KEY_ALIAS: ${{ vars.EVIDENCE_KEY_ALIAS }}" >> $GITHUB_STEP_SUMMARY
           fi
