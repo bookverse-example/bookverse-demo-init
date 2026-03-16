@@ -31,10 +31,10 @@ upload_evidence_key_to_jfrog() {
         echo "Public key uploaded to JFrog Platform"
         return 0
     elif [[ "$http_code" == "409" ]]; then
-        log_info "Key alias '$alias' already exists in JFrog Platform"
+        echo "ERROR: Key alias '$alias' already exists in JFrog Platform"
         return 1
     else
-        log_warning "Failed to upload public key (HTTP $http_code)"
+        echo "ERROR: Failed to upload public key (HTTP $http_code)"
         return 1
     fi
 }
