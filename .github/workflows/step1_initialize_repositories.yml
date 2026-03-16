@@ -119,7 +119,7 @@ jobs:
           echo "Checking JFrog Platform access from the JF CLI."
           jf rt ping
 
-      - name: Generate Evidence Keys
+      - name: Generate Evidence Signing Keys
         env:
           EVIDENCE_KEY_ALIAS: ${{ github.event.inputs.evidence_key_alias }}
           EVIDENCE_PRIVATE_SECRET: ${{ secret.EVIDENCE_PRIVATE_KEY }}
@@ -131,25 +131,28 @@ jobs:
           source .github/scripts/setup/upload_evidence_public_key.sh
           jf evd generate-key-pair --key-alias "${EVIDENCE_KEY_ALIAS}" --key-file-name "${EVIDENCE_KEY_ALIAS}" --key-file-path "./keys" --upload-public-key="false"
           upload_evidence_key_to_jfrog "./keys/${EVIDENCE_KEY_ALIAS}.pub" "${EVIDENCE_KEY_ALIAS}"
-          
-          echo "Storing evidence keys into component github repository secrets"
-          for item in ${COMPONENTS}; do
-            echo "  Setting evidence key secrets for repo ${{ github.repository_owner }}/bookverse-${item}"
-            gh secret set "EVIDENCE_PRIVATE_KEY" --body "$(cat ./keys/${EVIDENCE_KEY_ALIAS}.key)" --repo "${{ github.repository_owner }}/bookverse-${item}"
-            # FIXME: Should the following be secrets or variables?
-            gh variable set "EVIDENCE_PUBLIC_KEY" --body "$(cat ./keys/${EVIDENCE_KEY_ALIAS}.pub)" --repo "${{ github.repository_owner }}/bookverse-${item}"
-            gh variable set "EVIDENCE_KEY_ALIAS" --body "${EVIDENCE_KEY_ALIAS}" --repo "${{ github.repository_owner }}/bookverse-${item}"
-          done
+          gh secret set "EVIDENCE_PRIVATE_KEY" --body "$(cat ./keys/${EVIDENCE_KEY_ALIAS}.key)" --repo "${{ github.repository_owner }}/bookverse-${item}"
+          # FIXME: Should the following be secrets or variables?
+          gh variable set "EVIDENCE_PUBLIC_KEY" --body "$(cat ./keys/${EVIDENCE_KEY_ALIAS}.pub)" --repo "${{ github.repository_owner }}/bookverse-${item}"
+          gh variable set "EVIDENCE_KEY_ALIAS" --body "${EVIDENCE_KEY_ALIAS}" --repo "${{ github.repository_owner }}/bookverse-${item}"
 
       - name: Update GitHub Repository Secrets and Variables
+        # NOTE: These secrets and variables are pulled again in case they've been updated.
+        env:
+          EVIDENCE_PRIVATE_SECRET: ${{ secret.EVIDENCE_PRIVATE_KEY }}
+          EVIDENCE_PUBLIC_VARIABLE: ${{ vars.EVIDENCE_PUBLIC_KEY }}
+          EVIDENCE_ALIAS_VARIABLE: ${{ vars.EVIDENCE_KEY_ALIAS }}
         run: |
           echo "Updating GitHub Repository Secrets and Variables"
-          # FIXME: There was some retry logic around this.  Should it be retried?  Seems like bigger scope problems if this needs to be retried.
           for item in ${COMPONENTS}; do
             echo "Storing secrets and variables for repo ${{ github.repository_owner }}/bookverse-${item}"
-            # Skip a couple of values if the demo-init repo
+            # NOTE: Skip some values that we don't want to overwrite if the demo-init repo
             if [[ ${item} != "demo-init" ]]; then
               gh secret set "JFROG_ADMIN_TOKEN" --body "${JFROG_ADMIN_TOKEN}" --repo "${{ github.repository_owner }}/bookverse-${item}"
+              gh secret set "EVIDENCE_PRIVATE_KEY" --body "${EVIDENCE_PRIVATE_SECRET}" --repo "${{ github.repository_owner }}/bookverse-${item}"
+              # FIXME: Should the following be secrets or variables?
+              gh variable set "EVIDENCE_PUBLIC_KEY" --body "${EVIDENCE_PUBLIC_VARIABLE}" --repo "${{ github.repository_owner }}/bookverse-${item}"
+              gh variable set "EVIDENCE_KEY_ALIAS" --body "${EVIDENCE_ALIAS_VARIABLE}" --repo "${{ github.repository_owner }}/bookverse-${item}"
             fi
             # FIXME: Should this be made a secret and move into the skip section above?
             gh variable set "JFROG_URL" --body "${NEW_JFROG_URL}" --repo "${{ github.repository_owner }}/bookverse-${item}"
