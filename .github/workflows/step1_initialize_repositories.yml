@@ -131,10 +131,10 @@ jobs:
           source .github/scripts/setup/upload_evidence_public_key.sh
           jf evd generate-key-pair --key-alias "${EVIDENCE_KEY_ALIAS}" --key-file-name "${EVIDENCE_KEY_ALIAS}" --key-file-path "./keys" --upload-public-key="false"
           upload_evidence_key_to_jfrog "./keys/${EVIDENCE_KEY_ALIAS}.pub" "${EVIDENCE_KEY_ALIAS}"
-          gh secret set "EVIDENCE_PRIVATE_KEY" --body "$(cat ./keys/${EVIDENCE_KEY_ALIAS}.key)" --repo "${{ github.repository_owner }}/bookverse-${item}"
+          gh secret set "EVIDENCE_PRIVATE_KEY" --body "$(cat ./keys/${EVIDENCE_KEY_ALIAS}.key)" --repo "${{ github.repository_owner }}/bookverse-demo-init"
           # FIXME: Should the following be secrets or variables?
-          gh variable set "EVIDENCE_PUBLIC_KEY" --body "$(cat ./keys/${EVIDENCE_KEY_ALIAS}.pub)" --repo "${{ github.repository_owner }}/bookverse-${item}"
-          gh variable set "EVIDENCE_KEY_ALIAS" --body "${EVIDENCE_KEY_ALIAS}" --repo "${{ github.repository_owner }}/bookverse-${item}"
+          gh variable set "EVIDENCE_PUBLIC_KEY" --body "$(cat ./keys/${EVIDENCE_KEY_ALIAS}.pub)" --repo "${{ github.repository_owner }}/bookverse-demo-init"
+          gh variable set "EVIDENCE_KEY_ALIAS" --body "${EVIDENCE_KEY_ALIAS}" --repo "${{ github.repository_owner }}/bookverse-demo-init"
 
       - name: Update GitHub Repository Secrets and Variables
         # NOTE: These secrets and variables are pulled again in case they've been updated.
