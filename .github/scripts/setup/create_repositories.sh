@@ -17,35 +17,35 @@ SERVICES=(
     "infra"         # Infrastructure libraries and shared DevOps automation components
 )
 
-get_packages_for_service() {
-    local service="$1"
-    case "$service" in
-        inventory)
-            echo "docker pypi"
-            ;;
-        recommendations)
-            echo "docker generic"
-            ;;
-        checkout)
-            echo "docker generic"
-            ;;
-        platform)
-            echo "docker"
-            ;;
-        web)
-            echo "generic"
-            ;;
-        helm)
-            echo "helm"
-            ;;
-        infra)
-            echo "pypi generic"
-            ;;
-        *)
-            echo "docker"
-            ;;
-    esac
-}
+#get_packages_for_service() {
+#    local service="$1"
+#    case "$service" in
+#        inventory)
+#            echo "docker pypi"
+#            ;;
+#        recommendations)
+#            echo "docker generic"
+#            ;;
+#        checkout)
+#            echo "docker generic"
+#            ;;
+#        platform)
+#            echo "docker"
+#            ;;
+#        web)
+#            echo "generic"
+#            ;;
+#        helm)
+#            echo "helm"
+#            ;;
+#        infra)
+#            echo "pypi generic"
+#            ;;
+#        *)
+#            echo "docker"
+#            ;;
+#    esac
+#}
 
 echo ""
 echo "🚀 Creating repositories for BookVerse microservices platform"
