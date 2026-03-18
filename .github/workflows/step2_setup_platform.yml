@@ -15,6 +15,7 @@ env:
   JFROG_URL: ${{ vars.JFROG_URL }}
   JFROG_ADMIN_TOKEN: ${{ secrets.JFROG_ADMIN_TOKEN }}
   GH_TOKEN: ${{ secrets.GH_TOKEN }}
+  GH_REPOSITORY_OWNER: ${{ github.repository_owner }}
   SERVICES: "checkout core helm infra inventory platform recommendations web"
   SERVICES_DOCKER: "checkout core inventory platform recommendations web"
   SERVICES_GENERIC: "checkout helm infra inventory platform recommendations web"
