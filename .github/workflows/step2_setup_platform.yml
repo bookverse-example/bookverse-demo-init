@@ -1,77 +1,5 @@
-# =============================================================================
-# BookVerse Platform - Comprehensive Platform Setup Workflow
-# =============================================================================
-#
-# This GitHub Actions workflow provides complete BookVerse platform setup
-# automation, implementing sophisticated JFrog Platform provisioning, repository
-# creation, user management, OIDC integration, and comprehensive validation
-# for enterprise-grade platform deployment with zero-touch automation.
-#
-# 🏗️ WORKFLOW ARCHITECTURE:
-#     - Platform Provisioning: Complete JFrog Platform setup and configuration
-#     - Repository Management: Automated creation of all service repositories
-#     - User Management: Comprehensive user and role creation with permissions
-#     - Security Integration: OIDC authentication and zero-trust configuration
-#     - Validation Framework: Complete setup validation and health verification
-#     - Evidence Management: Cryptographic evidence setup for compliance
-#
-# 🚀 KEY FEATURES:
-#     - Complete zero-touch platform setup with comprehensive automation
-#     - Sophisticated JFrog Platform integration with admin-level provisioning
-#     - Comprehensive repository creation for all BookVerse microservices
-#     - Advanced user management with role-based access control
-#     - Enterprise OIDC integration for zero-trust authentication
-#     - Complete validation framework ensuring successful deployment
-#
-# 📊 BUSINESS LOGIC:
-#     - Platform Deployment: Complete platform deployment for production readiness
-#     - Demo Preparation: Comprehensive demo environment setup and configuration
-#     - Development Support: Platform setup for development and testing environments
-#     - Enterprise Integration: Production-ready enterprise platform deployment
-#     - Compliance Support: Evidence management and audit trail configuration
-#
-# 🛠️ USAGE PATTERNS:
-#     - Production Deployment: Complete production platform setup
-#     - Demo Environment: Comprehensive demo platform configuration
-#     - Development Setup: Platform setup for development environments
-#     - Training Scenarios: Educational platform deployment for learning
-#     - CI/CD Integration: Automated platform provisioning in pipelines
-#
-# ⚡ TRIGGER CONDITIONS:
-#     - Manual Dispatch: Workflow triggered manually via GitHub Actions UI
-#     - On-Demand Setup: Platform setup initiated by authorized users
-#     - Environment Creation: New environment provisioning workflows
-#     - Disaster Recovery: Platform recreation for disaster recovery scenarios
-#
-# 🔧 ENVIRONMENT VARIABLES:
-#     - JFROG_URL: JFrog Platform URL (repository variable)
-#     - JFROG_ADMIN_TOKEN: Admin token for platform access (secret)
-#     - GH_TOKEN: GitHub token for repository management (secret)
-#
-# 📋 PREREQUISITES:
-#     - JFrog Platform: Admin access to target JFrog Platform instance
-#     - GitHub Organization: Permissions to create repositories and manage workflows
-#     - Admin Credentials: Valid admin tokens for JFrog and GitHub platforms
-#
-# 🎯 SUCCESS CRITERIA:
-#     - Complete JFrog Platform configuration with all repositories and users
-#     - Successful OIDC integration enabling zero-trust authentication
-#     - Comprehensive validation confirming all components are operational
-#     - Evidence management setup for cryptographic compliance
-#
-# Authors: BookVerse Platform Team
-# Version: 1.0.0
-# =============================================================================
-
 name: 'Step 2: Setup Platform'
 
-# 🔄 Concurrency Control: Ensures only one platform setup runs at a time
-# Prevents conflicting platform provisioning and ensures safe setup operations
-concurrency:
-  group: platform-operations-${{ vars.PROJECT_KEY || 'bookverse' }}
-  cancel-in-progress: false  # Queue setup/cleanup operations to prevent conflicts
-
-# 🎯 Trigger Configuration: Manual workflow dispatch for controlled platform setup
 on:
   workflow_dispatch:
     inputs:
@@ -81,88 +9,121 @@ on:
         type: boolean
         default: true
 
-# 🔧 Environment Configuration: Core platform access and authentication
 env:
-  JFROG_URL: ${{ vars.JFROG_URL }}                    # JFrog Platform URL (repository variable)
-  JFROG_ADMIN_TOKEN: ${{ secrets.JFROG_ADMIN_TOKEN }} # JFrog admin token (secret)
-  GH_TOKEN: ${{ secrets.GH_TOKEN }}                   # GitHub token for repository management (secret)
-  GH_REPOSITORY_OWNER: ${{ vars.GH_REPOSITORY_OWNER || github.repository_owner }} # GitHub repository owner/organization
+  JF_URL: ${{ vars.JFROG_URL }}
+  JF_ACCESS_TOKEN: ${{ secrets.JFROG_ADMIN_TOKEN }}
+  JFROG_URL: ${{ vars.JFROG_URL }}
+  JFROG_ADMIN_TOKEN: ${{ secrets.JFROG_ADMIN_TOKEN }}
+  GH_TOKEN: ${{ secrets.GH_TOKEN }}
+  SERVICES: "checkout core helm infra inventory platform recommendations web"
+  SERVICES_DOCKER: "checkout core inventory platform recommendations web"
+  SERVICES_GENERIC: "checkout helm infra inventory platform recommendations web"
+  SERVICES_HELM: "helm"
+  SERVICES_NPM: "web"
+  SERVICES_PYPI: "checkout core infra inventory platform recommendations"
+
+# FIXME: Verify these settings
+concurrency:
+  group: platform-operations-${{ vars.PROJECT_KEY }}
+  cancel-in-progress: false
 
 jobs:
   setup-platform:
-    # 🖥️ Execution Environment: Ubuntu latest for consistent tooling and performance
     runs-on: ubuntu-latest
-    
+    name: Setup Platform
+
     steps:
-      # 📥 Source Code Access: Checkout complete repository for setup scripts access
-      - name: Checkout code
-        uses: actions/checkout@v4
-        # Provides access to all setup scripts and configuration files
-
-      # 🔧 JFrog CLI Setup: Configure JFrog CLI
-      - name: Setup JFrog CLI
-        uses: jfrog/setup-jfrog-cli@v4
-        with:
-          version: 2.88.0
-
-      # ✅ Configuration Validation: Verify required environment variables are configured
-      - name: "Preflight: require JFROG_URL"
-        run: |
-          # Validate that essential JFrog Platform URL is configured
-          if [[ -z "${{ env.JFROG_URL }}" ]]; then
-            echo "❌ Missing vars.JFROG_URL. Set repository variable JFROG_URL before running." >&2
-            exit 1
-          fi
-          # This prevents workflow execution with incomplete configuration
-
-      # 🔐 JFrog Platform Authentication: Establish authenticated connection to JFrog Platform
-      - name: Initialize JFrog Platform
-        run: |
-          # Configure JFrog CLI with admin credentials for platform provisioning
-          jf c add bookverse-admin --url "$JFROG_URL" --access-token "$JFROG_ADMIN_TOKEN" --interactive=false
-          jf c use bookverse-admin
-          jf c show
-          
-          # Validate platform connectivity and permissions before proceeding
-          ./.github/scripts/setup/validate_environment.sh
-
-      # 🐍 Python Runtime Setup: Configure Python environment for advanced automation scripts
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'  # Python 3.11 for advanced scripting and API integration
+          python-version: '3.11'
 
-      # 📦 Node.js Runtime Setup: Configure Node.js for package management and build processes
+      # FIXME: Node 20 is deprecated.  Can Node 24 work?
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'  # Node.js 20 LTS for modern JavaScript support
+          node-version: '20'
 
-      # 🏗️ Foundation: Create the core BookVerse project with enterprise configuration
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup JFrog CLI
+        uses: jfrog/setup-jfrog-cli@v4
+        with:
+          version: 2.91.0
+
+      - name: Validate Inputs
+        env:
+          JFROG_URL: ${{ vars.JFROG_URL }}
+          JFROG_ADMIN_TOKEN: ${{ secrets.JFROG_ADMIN_TOKEN }}
+          PROJECT_KEY: ${{ vars.PROJECT_KEY }}
+        run: |
+          # Validate the JFrog URL
+          if [[ -z "${JFROG_URL}" ]]; then
+            echo "ERROR: JFROG_URL variable not set."
+            exit 1
+          fi
+          
+          # Validate the JFrog Admin Token
+          if [[ -z "${JFROG_ADMIN_TOKEN}" ]]; then
+            echo "ERROR: JFROG_ADMIN_TOKEN secret not set."
+            exit 1
+          fi
+          
+          # Validate the JFrog Project Key
+          if [[ -z "${PROJECT_KEY}" ]]; then
+            echo "ERROR: PROJECT_KEY variable not set."
+            exit 1
+          fi
+          
+          # Validate the GitHub Token
+          if [[ -z "${GH_TOKEN}" ]]; then
+            echo "ERROR: GH_TOKEN secret not set."
+            exit 1
+          fi
+
+      - name: Verify JFrog Platform Connectivity
+        run: |
+          echo "Checking JFrog Platform access from the JF CLI."
+          jf rt ping
+
+      # NOTE: Skipping this step as it's unnecessary.  The checks don't even all work correctly.
+      #- name: Initialize JFrog Platform
+      #  run: |
+      #    # Configure JFrog CLI with admin credentials for platform provisioning
+      #    jf c add bookverse-admin --url "$JFROG_URL" --access-token "$JFROG_ADMIN_TOKEN" --interactive=false
+      #    jf c use bookverse-admin
+      #    jf c show
+      #    
+      #    # Validate platform connectivity and permissions before proceeding
+      #    ./.github/scripts/setup/validate_environment.sh
+
+      # FIXME: Clean this up later, once other items are pulled out an use the JF CLI.
+      # NOTE: This has to be a script calling the API as there's not currently project management in the JF CLI.
       - name: Create Project
         run: |
-          # Establish the foundational BookVerse project with unlimited storage and admin privileges
           ./.github/scripts/setup/create_project.sh
 
-      # ⏭️ Lifecycle Management: Configure application lifecycle stages for promotion workflows
+      # FIXME: Clean this up later, once other items are pulled out an use the JF CLI.
+      # NOTE: This has to be a script calling the API as there's not currently Lifecycle management in the JF CLI.
       - name: Create Lifecycle Stages
         run: |
           # Create DEV → QA → STAGING → PROD promotion pipeline stages
           ./.github/scripts/setup/create_stages.sh
 
-      # 📦 Service Repositories: Create repositories for all BookVerse microservices
+      # FIXME: Convert to JF CLI
       - name: Create Service Repositories
         run: |
           # Create Docker, Python, npm, and Helm repositories for all services
           ./.github/scripts/setup/create_repositories.sh
 
-      # 🔗 Dependency Management: Create repositories for external dependencies and caching
+      # FIXME: Convert to JF CLI
       - name: Create Dependency Repositories
         run: |
           # Create proxy repositories for npm, PyPI, and other dependency sources
           ./.github/scripts/setup/create_dependency_repos.sh
 
-      # ⚡ Performance Optimization: Pre-populate dependency caches for faster builds
+      # FIXME: Can this be converted to JF CLI?
       - name: Pre-populate Dependencies Cache
         if: ${{ inputs.prepopulate_dependencies }}
         run: |
@@ -170,42 +131,48 @@ jobs:
           # Controlled by workflow input 'prepopulate_dependencies' (defaults to true)
           ./.github/scripts/setup/prepopulate_dependencies.sh
 
-      # 🛡️ Access Control: Create custom roles with appropriate permissions for platform operations
+      # FIXME: Clean this up later, once other items are pulled out an use the JF CLI.
+      # NOTE: This has to be a script calling the API as there's not currently role management in the JF CLI.
       - name: Create Custom Roles
         run: |
           # Create developer, manager, and architect roles with graduated permissions
           ./.github/scripts/setup/create_roles.sh
 
-      # 👥 User Management: Create user accounts with role-based access control
+      # FIXME: Clean this up later, once other items are pulled out an use the JF CLI.
+      # NOTE: This has to be a script calling the API as there's not currently user management in the JF CLI.
       - name: Create Users
         run: |
           # Create user accounts for developers, managers, and service accounts
           ./.github/scripts/setup/create_users.sh
 
-      # 📱 Application Setup: Create AppTrust applications for lifecycle management
+      # FIXME: Clean this up later, once other items are pulled out an use the JF CLI.
+      # NOTE: This has to be a script calling the API as there's not currently AppTrust / Lifecycle management in the JF CLI.
       - name: Create Applications
         run: |
           # Create AppTrust applications for each microservice with lifecycle configuration
           ./.github/scripts/setup/create_applications.sh
 
-
-      # 🔐 Policy Management: Create unified policies for lifecycle gate enforcement
+      # FIXME: Clean this up later, once other items are pulled out an use the JF CLI.
+      # NOTE: This has to be a script calling the API as there's not currently Unified Policy management in the JF CLI.
       - name: Create Unified Policies
         run: |
           # Create and configure all BookVerse unified policies for lifecycle management
           ./.github/scripts/setup/create_policies.sh
-      # 🔐 Zero-Trust Security: Configure OIDC integration for passwordless authentication
+
+      # FIXME: Clean this up later, once other items are pulled out an use the JF CLI.
+      # NOTE: This has to be a script calling the API as there's not currently OIDC management in the JF CLI.
       - name: Configure Security Integration
         run: |
           # Establish OIDC trust relationships between GitHub Actions and JFrog Platform
           ./.github/scripts/setup/create_oidc.sh
 
-      # ✅ Comprehensive Validation: Verify complete platform setup and operational readiness
+      # FIXME: Validate the validation.
       - name: Validate Complete Setup
         run: |
           # Execute comprehensive validation of all platform components and integrations
           ./.github/scripts/setup/validate_setup.sh
 
+      # FIXME: Cleanup and simplify the summary.
       - name: 📋 Setup Platform Summary
         if: always()
         run: |
