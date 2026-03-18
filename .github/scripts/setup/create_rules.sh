@@ -8,6 +8,23 @@ source "$(dirname "$0")/config.sh"
 log_info "🔧 Creating BookVerse Unified Policy Rules..."
 
 # Check required environment variables
+check_env_vars() {
+    local missing_vars=()
+    for var in "$@"; do
+        if [[ -z "${!var:-}" ]]; then
+            missing_vars+=("$var")
+        fi
+    done
+    
+    if [[ ${#missing_vars[@]} -gt 0 ]]; then
+        log_error "Missing required environment variables:"
+        printf '   - %s\n' "${missing_vars[@]}"
+        echo ""
+        echo "Please set these variables and try again."
+        exit 1
+    fi
+}
+
 check_env_vars JFROG_URL JFROG_ADMIN_TOKEN PROJECT_KEY
 
 API_BASE="$JFROG_URL/unifiedpolicy/api/v1"

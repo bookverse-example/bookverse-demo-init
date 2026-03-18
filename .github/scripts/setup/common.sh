@@ -16,11 +16,9 @@
 #     [Script Management]
 #     init_script()            : Initialize script with error handling and validation
 #     finalize_script()        : Finalize script execution with success/failure reporting
-#     process_batch()          : Process arrays of items with consistent error handling
 #     
 #     [Environment Management]
 #     validate_environment()   : Validate required environment variables are present
-#     show_config()           : Display current configuration for debugging
 
 # ENVIRONMENT VARIABLES:
 #     [Required Variables]
@@ -231,37 +229,6 @@ init_script() {
     echo ""
 }
 
-process_batch() {
-    local batch_name="$1"
-    local items_array_name="$2"
-    local processor_function="$3"
-    
-    local -n items_ref="$items_array_name"
-    local total=${#items_ref[@]}
-    local count=0
-    
-    log_step "Processing $total $batch_name..."
-    
-    for item in "${items_ref[@]}"; do
-        ((count++))
-        echo ""
-        log_info "[$count/$total] Processing $batch_name..."
-        
-        if ! "$processor_function" "$item"; then
-            log_error "Failed to process item $count of $total"
-            FAILED=true
-        fi
-    done
-    
-    echo ""
-    if [[ "$FAILED" != "true" ]]; then
-        log_success "All $total $batch_name processed successfully"
-    else
-        log_error "Some $batch_name failed to process"
-    fi
-}
-
-
 validate_environment() {
     local missing_vars=()
     
@@ -282,36 +249,9 @@ validate_environment() {
     fi
 }
 
-check_env_vars() {
-    local missing_vars=()
-    for var in "$@"; do
-        if [[ -z "${!var:-}" ]]; then
-            missing_vars+=("$var")
-        fi
-    done
-    
-    if [[ ${#missing_vars[@]} -gt 0 ]]; then
-        log_error "Missing required environment variables:"
-        printf '   - %s\n' "${missing_vars[@]}"
-        echo ""
-        echo "Please set these variables and try again."
-        exit 1
-    fi
-}
-
-show_config() {
-    log_config "Current BookVerse Configuration:"
-    log_config "Project Key: ${PROJECT_KEY}"
-    log_config "Project Name: ${PROJECT_DISPLAY_NAME}"
-    log_config "JFrog URL: ${JFROG_URL}"
-    log_config "Non-Prod Stages: ${NON_PROD_STAGES[*]}"
-    log_config "Production Stage: ${PROD_STAGE}"
-}
-
 export -f setup_error_handling error_handler
 export -f log_info log_success log_warning log_error log_step log_config log_section log_debug
 export -f jfrog_api_call handle_api_response
 
-
-export -f init_script finalize_script process_batch 
-export -f validate_environment check_env_vars show_config
+export -f init_script finalize_script 
+export -f validate_environment
