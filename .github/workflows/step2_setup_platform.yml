@@ -88,17 +88,6 @@ jobs:
           echo "Checking JFrog Platform access from the JF CLI."
           jf rt ping
 
-      # NOTE: Skipping this step as it's unnecessary.  The checks don't even all work correctly.
-      #- name: Initialize JFrog Platform
-      #  run: |
-      #    # Configure JFrog CLI with admin credentials for platform provisioning
-      #    jf c add bookverse-admin --url "$JFROG_URL" --access-token "$JFROG_ADMIN_TOKEN" --interactive=false
-      #    jf c use bookverse-admin
-      #    jf c show
-      #    
-      #    # Validate platform connectivity and permissions before proceeding
-      #    ./.github/scripts/setup/validate_environment.sh
-
       # FIXME: Clean this up later, once other items are pulled out an use the JF CLI.
       # NOTE: This has to be a script calling the API as there's not currently project management in the JF CLI.
       - name: Create Project
