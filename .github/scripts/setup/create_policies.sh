@@ -1,32 +1,5 @@
 #!/usr/bin/env bash
 
-# =============================================================================
-# BookVerse Platform - Unified Policy Creation Script
-# =============================================================================
-#
-# This comprehensive script creates and configures all BookVerse unified
-# policies according to the specified lifecycle gate requirements, implementing
-# enterprise-grade policy management for evidence collection, compliance
-# enforcement, and lifecycle gate automation.
-#
-# 🚀 POLICY ARCHITECTURE:
-#     - DEV Stage: Entry gates for Jira, SLSA, build evidence (SonarQube), Docker evidence (SAST), and package evidence (unit tests); Exit gate for smoke tests
-#     - QA Stage: Exit gates for DAST and Postman collection testing
-#     - STAGING Stage: Exit gates for penetration testing, change management, and IaC scanning
-#     - PROD Stage: Release gates for stage completion verification
-#
-# 📋 POLICIES CREATED:
-#     DEV Entry: Atlassian Jira Required, SLSA Provenance Required, Build Quality Gate Required, Docker SAST Evidence Required, Package Unit Test Evidence Required
-#     DEV Exit: Smoke Test Required
-#     QA Exit: Invicti DAST Required, Postman Collection Required
-#     STAGING Exit: Cobalt Pentest Required, ServiceNow Change Required, Snyk IaC Required
-#     PROD Release: DEV Completion Required, QA Completion Required, STAGING Completion Required
-#
-# Authors: BookVerse Platform Team
-# Version: 1.0.0
-# Last Updated: 2024
-#
-
 set -euo pipefail
 
 source "$(dirname "$0")/common.sh"
@@ -35,6 +8,23 @@ source "$(dirname "$0")/config.sh"
 log_info "🔐 Creating BookVerse Unified Policies..."
 
 # Check required environment variables
+check_env_vars() {
+    local missing_vars=()
+    for var in "$@"; do
+        if [[ -z "${!var:-}" ]]; then
+            missing_vars+=("$var")
+        fi
+    done
+    
+    if [[ ${#missing_vars[@]} -gt 0 ]]; then
+        log_error "Missing required environment variables:"
+        printf '   - %s\n' "${missing_vars[@]}"
+        echo ""
+        echo "Please set these variables and try again."
+        exit 1
+    fi
+}
+
 check_env_vars JFROG_URL JFROG_ADMIN_TOKEN PROJECT_KEY
 
 # First, ensure all rules are created/updated with correct predicate types
