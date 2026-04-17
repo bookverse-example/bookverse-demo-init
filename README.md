@@ -72,7 +72,7 @@ Quick Start
 4. Run the _Step 2: Setup Platform_ action.  This can be found on the _Actions_ tab.  No settings are required for this
    action.
 
-5. Run the _Step 3: Setup Kubernetes and ArgoCD_ actin. NOTE: THIS DOESN'T EXIST YET!
+5. Run the _Step 2.5: Setup Kubernetes and ArgoCD_ actin. NOTE: THIS DOESN'T EXIST YET!
 
 [//]: <> (FIXME: This should be created to split the Kubernetes and ArgoCD setup to a separate action.)
 
