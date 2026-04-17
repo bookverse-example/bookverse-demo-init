@@ -17,9 +17,7 @@ and OIDC integration — can be stood up automatically through the orchestration
 
 [What is BookVerse Example?](docs/what_is_bookverse_example.md)
 
-[Documentation](docs/index.md)
-
-[Getting Started Guide](docs/GETTING_STARTED.md)
+[Documentation](docs/)
 
 [Application Architecture Overview](docs/application_architecture.md)
 
