@@ -1,4 +1,7 @@
-# BookVerse Platform - Evidence Guide
+Explanation of Evidence
+=======================
+
+This document explains how the Evidence feature in the JFrog Platform works and is used in the BookVerse Example.
 
 **Complete guide to evidence collection, signing, and verification in the BookVerse demo platform**
 
@@ -760,80 +763,3 @@ export EVIDENCE_DEBUG=true
 # Run with verbose output
 bash -x ./scripts/evidence-operation.sh
 ```
-
-
----
-
-## ✅ Best Practices
-
-### Evidence Collection
-
-1. **Collect Early and Often**: Attach evidence at every significant step in the pipeline
-2. **Use Meaningful Evidence**: Ensure evidence provides real value for security and compliance
-3. **Stage-Appropriate Evidence**: Attach evidence appropriate for each lifecycle stage
-4. **Automate Collection**: Use CI/CD integration for consistent evidence collection
-5. **Validate Evidence**: Always verify evidence is correctly attached and signed
-
-### Key Management
-
-1. **Regular Rotation**: Rotate evidence keys every 90 days minimum
-2. **Secure Storage**: Store private keys securely, never in code repositories
-3. **Algorithm Choice**: Use ED25519 for new deployments, RSA for compatibility
-4. **Key Backup**: Maintain secure backups of evidence keys
-5. **Access Control**: Limit access to evidence signing keys to authorized systems
-
-### Template Management
-
-1. **Version Templates**: Keep evidence templates under version control
-2. **Validate Templates**: Test template processing before deployment
-3. **Standard Formats**: Use consistent formats across all evidence types
-4. **Documentation**: Document custom evidence types and their purpose
-5. **Schema Validation**: Validate evidence JSON against schemas when possible
-
-### CI/CD Integration
-
-1. **Fail Fast**: Fail builds if evidence attachment fails
-2. **Parallel Collection**: Collect evidence in parallel with other build steps
-3. **Error Handling**: Provide clear error messages for evidence failures
-4. **Retry Logic**: Implement retry logic for transient failures
-5. **Environment Separation**: Use different keys for different environments
-
-### Monitoring and Maintenance
-
-1. **Monitor Evidence Health**: Track evidence collection success rates
-2. **Audit Evidence**: Regularly audit attached evidence for completeness
-3. **Performance Monitoring**: Monitor impact of evidence collection on build times
-4. **Compliance Tracking**: Track evidence against compliance requirements
-5. **Regular Updates**: Keep evidence library and templates up to date
-
----
-
-## 🔗 Related Documentation
-
-- [JFrog CLI Documentation](https://jfrog.com/help/r/jfrog-cli) - Official JFrog CLI reference including evidence commands
-- [JFrog Platform Trust & Compliance](https://jfrog.com/compliance/) - JFrog security and compliance practices
-- [SLSA Framework](https://slsa.dev/) - Supply-chain Levels for Software Artifacts
-- [Sigstore](https://www.sigstore.dev/) - Software signing and verification
-- [NIST SSDF](https://csrc.nist.gov/Projects/ssdf) - Secure Software Development Framework
-
-### BookVerse Documentation
-
-- [Architecture Guide](ARCHITECTURE.md) - Overall platform architecture
-- [OIDC Authentication](OIDC_AUTHENTICATION.md) - Authentication setup
-- [JFrog Integration](JFROG_INTEGRATION.md) - JFrog platform configuration
-- [AppTrust Lifecycle](APPTRUST_LIFECYCLE.md) - Application lifecycle management
-
----
-
-## 📞 Support
-
-For issues with evidence collection:
-
-1. **Check this guide** for troubleshooting steps
-2. **Review logs** from CI/CD pipelines and JFrog platform
-3. **Validate configuration** using provided diagnostic commands
-4. **Test with debug mode** enabled for detailed output
-
----
-
-*This evidence guide covers the complete BookVerse evidence collection system with real JFrog AppTrust integration, cryptographic signing, and automated CI/CD workflows for software supply chain security.*

@@ -1,3 +1,13 @@
+Explanation of Application Lifecycle
+====================================
+
+This document explains how the Application Lifecycle feature of the AppTrust Product in the JFrog Platform works and is
+used in the BookVerse Example.
+
+
+
+
+
 # BookVerse Promotion Workflows
 
 ## Overview
@@ -90,3 +100,6 @@ Most promotions happen automatically when CI/CD pipelines succeed and quality ga
 ---
 
 **Note**: Promotions to PROD require additional approvals and may have restricted time windows for safety.
+
+
+
