@@ -25,8 +25,6 @@ and OIDC integration — can be stood up automatically through the orchestration
 
 [Delivery Architecture Overview](docs/delivery_architecture.md)
 
-[Demo Runbook](docs/DEMO_RUNBOOK.md)
-
 [AppTrust Showcase Guide](docs/apptrust_showcase_guide.md)
 
 
