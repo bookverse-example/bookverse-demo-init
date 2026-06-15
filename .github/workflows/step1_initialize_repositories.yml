@@ -85,7 +85,7 @@ jobs:
             echo "gh repo view ${ORGANIZATION}/bookverse-${item}"
             if gh repo view "${ORGANIZATION}/bookverse-${item}" >/dev/null 2>&1; then
               echo "result: $?"
-              echo "${ORGANIZATION}/bookverse-${item} already exists"
+              echo "Repository ${ORGANIZATION}/bookverse-${item} has already been forked."
             else
               echo "result: $?"
               gh repo fork bookverse-example/bookverse-${item} --fork-name bookverse-${item}
