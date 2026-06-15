@@ -114,24 +114,19 @@ jobs:
         if: ${{ env.EVIDENCE_PRIVATE_SECRET == '' || env.EVIDENCE_PUBLIC_VARIABLE == '' || env.EVIDENCE_ALIAS_VARIABLE == '' || github.event.inputs.generate_evidence_keys == 'true' }}
         run: |
           echo "Generating Evidence Signing Keys.  Either the keys are unset or the force regenerate option has been set."
-          #source .github/scripts/setup/upload_evidence_public_key.sh
-          echo "."
           jf evd generate-key-pair --key-alias "${EVIDENCE_KEY_ALIAS}" --key-file-name "${EVIDENCE_KEY_ALIAS}" --key-file-path "./keys" --upload-public-key="false"
-          echo ".."
           # FIXME: This should probably be moved to the "Step 2: Setup Platform" workflow.
+          # FIXME: Should bring some of the error checking from the script ot here.
+          #source .github/scripts/setup/upload_evidence_public_key.sh
           #upload_evidence_key_to_jfrog "./keys/${EVIDENCE_KEY_ALIAS}.pub" "${EVIDENCE_KEY_ALIAS}"
           which jq
           PAYLOAD=`jq -n --arg alias "${EVIDENCE_KEY_ALIAS}" --arg public_key "$(cat ./keys/${EVIDENCE_KEY_ALIAS}.pub)" '{"alias": $alias, "public_key": $public_key}' 2>/dev/null`
-          curl -s -X POST -H "Authorization: Bearer $JF_ACCESS_TOKEN" -H "Content-Type: application/json" -d "${PAYLOAD}" "$JF_URL/artifactory/api/security/keys/trusted"
-          echo ""
-          echo "..."
+          RESPONSE=curl -s  -w "%{http_code}" -X POST -H "Authorization: Bearer $JF_ACCESS_TOKEN" -H "Content-Type: application/json" -d "${PAYLOAD}" "$JF_URL/artifactory/api/security/keys/trusted"
+          echo "${RESPONSE}"
           gh secret set "EVIDENCE_PRIVATE_KEY" --body "$(cat ./keys/${EVIDENCE_KEY_ALIAS}.key)" --repo "${{ github.repository_owner }}/bookverse-demo-init"
-          echo "...."
           # FIXME: Should the following be secrets or variables?
           gh variable set "EVIDENCE_PUBLIC_KEY" --body "$(cat ./keys/${EVIDENCE_KEY_ALIAS}.pub)" --repo "${{ github.repository_owner }}/bookverse-demo-init"
-          echo "....."
           gh variable set "EVIDENCE_KEY_ALIAS" --body "${EVIDENCE_KEY_ALIAS}" --repo "${{ github.repository_owner }}/bookverse-demo-init"
-          echo "......"
 
       - name: Update GitHub Repository Secrets and Variables
         # NOTE: These secrets and variables are pulled again in case they've been updated.
