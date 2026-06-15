@@ -114,16 +114,15 @@ jobs:
         if: ${{ env.EVIDENCE_PRIVATE_SECRET == '' || env.EVIDENCE_PUBLIC_VARIABLE == '' || env.EVIDENCE_ALIAS_VARIABLE == '' || github.event.inputs.generate_evidence_keys == 'true' }}
         run: |
           echo "Generating Evidence Signing Keys.  Either the keys are unset or the force regenerate option has been set."
-          source .github/scripts/setup/upload_evidence_public_key.sh
+          #source .github/scripts/setup/upload_evidence_public_key.sh
           echo "."
           jf evd generate-key-pair --key-alias "${EVIDENCE_KEY_ALIAS}" --key-file-name "${EVIDENCE_KEY_ALIAS}" --key-file-path "./keys" --upload-public-key="false"
           echo ".."
           # FIXME: This should probably be moved to the "Step 2: Setup Platform" workflow.
           #upload_evidence_key_to_jfrog "./keys/${EVIDENCE_KEY_ALIAS}.pub" "${EVIDENCE_KEY_ALIAS}"
           which jq
-          local payload
-          payload=`jq -n --arg alias "${EVIDENCE_KEY_ALIAS}" --arg public_key "$(cat ./keys/${EVIDENCE_KEY_ALIAS}.pub)" '{"alias": $alias, "public_key": $public_key}' 2>/dev/null`
-          curl -s -X POST -H "Authorization: Bearer $JF_ADMIN_TOKEN" -H "Content-Type: application/json" -d "$payload" "$JF_URL/artifactory/api/security/keys/trusted"
+          PAYLOAD=`jq -n --arg alias "${EVIDENCE_KEY_ALIAS}" --arg public_key "$(cat ./keys/${EVIDENCE_KEY_ALIAS}.pub)" '{"alias": $alias, "public_key": $public_key}' 2>/dev/null`
+          curl -s -X POST -H "Authorization: Bearer $JF_ADMIN_TOKEN" -H "Content-Type: application/json" -d "${PAYLOAD}" "$JF_URL/artifactory/api/security/keys/trusted"
           echo "..."
           gh secret set "EVIDENCE_PRIVATE_KEY" --body "$(cat ./keys/${EVIDENCE_KEY_ALIAS}.key)" --repo "${{ github.repository_owner }}/bookverse-demo-init"
           echo "...."
