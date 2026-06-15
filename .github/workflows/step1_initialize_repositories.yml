@@ -79,6 +79,8 @@ jobs:
         env:
           ORGANIZATION: ${{ github.repository_owner }}
         run: |
+          export PATUSER=`gh auth status --json hosts --jq '.hosts."github.com".[0].login'`
+          echo "GitHub PAT User: ${PATUSER}"
           echo "Forking the needed repositories into organization ${ORGANIZATION}"
           # skipping bookverse-demo-init as this should already be forked to run this action
           for item in ${COMPONENTS}; do
@@ -88,7 +90,13 @@ jobs:
               echo "Repository ${ORGANIZATION}/bookverse-${item} has already been forked."
             else
               echo "result: $?"
-              gh repo fork bookverse-example/bookverse-${item} --fork-name bookverse-${item}
+              if [[ "${ORGANIZATION}" == "${PATUSER}" ]]; then
+                echo "Owner appears to be user"
+                gh repo fork bookverse-example/bookverse-${item} --fork-name bookverse-${item}
+              else
+                echo "Owner appears to be org"
+                gh repo fork bookverse-example/bookverse-${item} --org ${ORGANIZATION} --fork-name bookverse-${item}
+              fi
             fi
           done
 
