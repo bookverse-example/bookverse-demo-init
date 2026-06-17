@@ -114,6 +114,8 @@ jobs:
         if: ${{ env.EVIDENCE_PRIVATE_SECRET == '' || env.EVIDENCE_PUBLIC_VARIABLE == '' || env.EVIDENCE_ALIAS_VARIABLE == '' || github.event.inputs.generate_evidence_keys == 'true' }}
         run: |
           echo "Generating Evidence Signing Keys.  Either the keys are unset or the force regenerate option has been set."
+          export PATUSER=`gh auth status --json hosts --jq '.hosts."github.com".[0].login'`
+          echo "GitHub PAT User: ${PATUSER}"
           jf evd generate-key-pair --key-alias "${EVIDENCE_KEY_ALIAS}" --key-file-name "${EVIDENCE_KEY_ALIAS}" --key-file-path "./keys" --upload-public-key="false"
           # FIXME: This should probably be moved to the "Step 2: Setup Platform" workflow.
           # FIXME: Should bring some of the error checking from the script ot here.
@@ -134,6 +136,7 @@ jobs:
             echo "ERROR: Failed to upload public key (HTTP ${HTTPCODE})"
             exit 1
           fi
+          
           gh secret set "EVIDENCE_PRIVATE_KEY" --body "$(cat ./keys/${EVIDENCE_KEY_ALIAS}.key)" --repo "${{ github.repository_owner }}/bookverse-demo-init"
           # FIXME: Should the following be secrets or variables?
           gh variable set "EVIDENCE_PUBLIC_KEY" --body "$(cat ./keys/${EVIDENCE_KEY_ALIAS}.pub)" --repo "${{ github.repository_owner }}/bookverse-demo-init"
